@@ -3,7 +3,7 @@ import * as store from './store.js';
 
 /**
  * Configuration page: choose which sites are guarded, optionally restrict
- * each one's reason to a fixed list, and toggle the unlock-time prompt.
+ * each one's reason to a fixed list, and toggle the prompt shown when Chrome opens.
  */
 
 const $ = (id) => document.getElementById(id);
@@ -107,14 +107,14 @@ $('addForm').addEventListener('submit', async (event) => {
   render();
 });
 
-$('unlockPrompt').addEventListener('change', async (event) => {
-  settings.unlockPrompt = event.target.checked;
+$('openPrompt').addEventListener('change', async (event) => {
+  settings.openPrompt = event.target.checked;
   await save();
 });
 
 async function load() {
   settings = await store.getSettings();
-  $('unlockPrompt').checked = settings.unlockPrompt;
+  $('openPrompt').checked = settings.openPrompt;
   render();
 }
 

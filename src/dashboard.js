@@ -19,7 +19,7 @@ function el(tag, props = {}, ...children) {
 }
 
 function siteLabel(site) {
-  return site || 'Unlock prompt';
+  return site || 'Opening Chrome';
 }
 
 async function render() {

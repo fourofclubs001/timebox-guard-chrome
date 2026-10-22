@@ -3,7 +3,7 @@ import * as store from './store.js';
 /**
  * The blocking prompt. The service worker sends a tab here instead of a
  * guarded site (`?site=<pattern>&url=<where it was going>`), or opens it
- * with no parameters as the generic unlock prompt.
+ * with no parameters as the generic prompt shown when Chrome opens.
  *
  * "Start session" asks the service worker to record the session, then
  * continues to the original URL. "Close tab instead" asks it to log the

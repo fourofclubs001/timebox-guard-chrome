@@ -9,7 +9,7 @@ import * as store from './store.js';
  *  3. When a session runs out (a chrome.alarms alarm at its end time), it
  *     re-blocks every tab still on that site.
  *  4. Times how long a guarded site is the focused tab, for the dashboard.
- *  5. Optionally shows the prompt right after the computer is unlocked.
+ *  5. Optionally shows the prompt whenever Chrome is opened.
  *
  * MV3 service workers are shut down when idle, so no state lives in
  * globals: settings, sessions and events are in chrome.storage.local (see
@@ -132,17 +132,27 @@ async function refreshTiming() {
   }
 }
 
-// ---- unlock prompt -------------------------------------------------------
+// ---- open-Chrome prompt --------------------------------------------------
 
-async function showUnlockPrompt() {
+/**
+ * The browser counterpart of the Android unlock prompt: when Chrome is
+ * opened, put the generic prompt in front of whatever it restored. Runs
+ * through [serial] because startup can fire both onStartup and
+ * windows.onCreated, and only one prompt should appear.
+ */
+async function showOpenPrompt(windowId) {
+  const { openPrompt } = await store.getSettings();
+  if (!openPrompt) return;
   const url = promptUrl(null);
   const tabs = await chrome.tabs.query({});
-  if (tabs.some((t) => t.url === url)) return; // already up
+  if (tabs.some((t) => t.url === url || t.pendingUrl === url)) return; // already up
 
-  const win = await chrome.windows.getLastFocused().catch(() => null);
-  if (win && win.type === 'normal') {
-    await chrome.tabs.create({ windowId: win.id, url, active: true });
-    await chrome.windows.update(win.id, { focused: true });
+  if (windowId === undefined) {
+    const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] }).catch(() => null);
+    windowId = win?.id;
+  }
+  if (windowId !== undefined) {
+    await chrome.tabs.create({ windowId, url, active: true });
   } else {
     await chrome.windows.create({ url, focused: true });
   }
@@ -159,7 +169,7 @@ const handlers = {
       await chrome.alarms.create(EXPIRY_ALARM_PREFIX + site, { when: endTime });
     }
     await store.logStart(site, reason, minutes);
-    // The unlock prompt has nothing to continue to; just get out of the way.
+    // The open-Chrome prompt has nothing to continue to; just get out of the way.
     if (!site) await dismissTab(sender.tab);
     return { endTime };
   },
@@ -221,14 +231,18 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 chrome.tabs.onRemoved.addListener(() => serial(refreshTiming));
 chrome.windows.onFocusChanged.addListener(() => serial(refreshTiming));
 
+// Pause timing while the screen is locked.
 chrome.idle.onStateChanged.addListener(async (state) => {
-  const { idleState: previous } = await chrome.storage.session.get('idleState');
   await chrome.storage.session.set({ idleState: state });
   await serial(refreshTiming);
-  if (previous === 'locked' && state === 'active') {
-    const { unlockPrompt } = await store.getSettings();
-    if (unlockPrompt) await showUnlockPrompt();
-  }
+});
+
+// Chrome opened with its first window. Covers Chrome that kept running in
+// the background with no windows, where onStartup doesn't fire.
+chrome.windows.onCreated.addListener(async (win) => {
+  if (win.type !== 'normal' || win.incognito) return;
+  const normal = await chrome.windows.getAll({ windowTypes: ['normal'] });
+  if (normal.filter((w) => !w.incognito).length === 1) serial(() => showOpenPrompt(win.id));
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -256,6 +270,7 @@ chrome.runtime.onStartup.addListener(() =>
     await rearmExpiryAlarms();
     // Banks a session left running when the browser last quit.
     await refreshTiming();
+    await showOpenPrompt();
   }),
 );
 

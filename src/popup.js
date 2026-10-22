@@ -29,7 +29,7 @@ async function render() {
 
   if (url.startsWith(PROMPT_PAGE)) {
     const site = new URL(url).searchParams.get('site');
-    siteEl.textContent = site || 'Unlock prompt';
+    siteEl.textContent = site || 'Opening Chrome';
     statusEl.textContent = 'Waiting for you to say how long, and why.';
     return;
   }

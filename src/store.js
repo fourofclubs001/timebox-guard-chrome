@@ -3,7 +3,7 @@
  * the Android app's `Prefs` and `UsageLog`:
  *
  *  - `settings`  — guarded sites (each with its optional fixed reason list)
- *                  and whether to prompt when the computer is unlocked.
+ *                  and whether to prompt whenever Chrome is opened.
  *  - `sessions`  — `{ [site]: endTime }`, the session deadline per site.
  *  - `events`    — append-only usage log, capped at [MAX_EVENTS].
  *
@@ -13,7 +13,7 @@
  *  - `"usage"` — a guarded site stopped being the focused tab after a
  *    started session; `durMs` is how long it was actually in front.
  *
- * Every event carries `site` (empty for the unlock prompt) and `ts`.
+ * Every event carries `site` (empty for the open-Chrome prompt) and `ts`.
  *
  * Writes to `sessions` and `events` all go through the service worker,
  * which serializes them, so read-modify-write here is safe.
@@ -33,7 +33,7 @@ async function get(key, fallback) {
 // ---- settings ------------------------------------------------------------
 
 export async function getSettings() {
-  return { sites: [], unlockPrompt: false, ...(await get('settings', {})) };
+  return { sites: [], openPrompt: false, ...(await get('settings', {})) };
 }
 
 export async function saveSettings(settings) {

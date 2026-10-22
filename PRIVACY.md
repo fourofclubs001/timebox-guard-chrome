@@ -8,7 +8,7 @@ Timebox Guard does not collect, transmit, or sell any data.
   is on a site you chose to guard. It never reads page contents, form
   input, or passwords.
 - **Whether your computer is locked** (`chrome.idle`), so it can pause
-  time tracking and, if you turn it on, show the prompt after you unlock.
+  time tracking while the screen is locked.
 
 ## What it stores
 
@@ -32,5 +32,5 @@ usage data**). Removing the extension deletes everything.
 | `tabs`          | Read tab URLs to spot guarded sites; send a tab to the prompt. |
 | `webNavigation` | Catch a guarded page before it loads.                     |
 | `alarms`        | Re-block a site when its session ends.                    |
-| `idle`          | Notice screen lock and unlock.                            |
+| `idle`          | Pause time tracking while the screen is locked.           |
 | `storage`       | Save your settings, sessions, and usage log locally.     |

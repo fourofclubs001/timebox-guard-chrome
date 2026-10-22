@@ -4,7 +4,7 @@ A Chrome extension port of [Timebox Guard](https://github.com/fourofclubs001/tim
 Instead of guarding Android apps, it guards **websites**: before you open
 a site you've chosen to limit, it asks how long you plan to stay and why,
 and it blocks the site again when that time is up. Optionally, it shows the
-same prompt whenever you unlock your computer.
+same prompt whenever you open Chrome.
 
 ## How it works
 
@@ -18,7 +18,7 @@ The Android app's pieces map onto the extension like this:
 | `SettingsActivity`                          | `settings.html` (also the extension's options page)        |
 | `MetricsActivity`                           | `dashboard.html`                                           |
 | `Prefs` + `UsageLog` (SharedPreferences)    | `src/store.js` (`chrome.storage.local`)                    |
-| Unlock prompt (`ACTION_USER_PRESENT`)       | Unlock prompt (`chrome.idle`: locked → active)             |
+| Unlock prompt (`ACTION_USER_PRESENT`)       | Open-Chrome prompt (startup, or first window opened)       |
 | "Close app instead" → home screen           | "Close tab instead" → closes the tab                       |
 
 - **Background service worker** (`src/background.js`) watches navigations
@@ -30,8 +30,8 @@ The Android app's pieces map onto the extension like this:
     it ends, and re-blocks every tab still on that site when it fires.
   - It times how long a guarded site is the focused tab in a focused
     window, for the dashboard.
-  - If you turned on the unlock prompt, it opens the prompt right after
-    you unlock your computer.
+  - If you turned on the open-Chrome prompt, it shows the prompt on top
+    of your tabs whenever Chrome starts or opens its first window.
 - **Prompt** (`prompt.html`): a minutes stepper (5–180, default 15) plus a
   reason. **Start session** continues to the page you were opening; **Close
   tab instead** closes the tab (or leaves a new tab page if it was the last
@@ -98,6 +98,5 @@ card in `chrome://extensions`.
   the extension's details.
 - **Other browsers and apps** aren't covered. Pair it with the Android app
   for your phone.
-- **The unlock prompt** needs Chrome to be running when you unlock.
-  Chrome only reports lock and unlock to extensions, so it can't tell a
-  real unlock from waking the screen without a lock.
+- **The open-Chrome prompt** isn't a lock: it's an intention check you
+  can close. Incognito windows don't trigger it.
