@@ -1,3 +1,4 @@
+import { guardedPattern } from './sites.js';
 import * as store from './store.js';
 
 /**
@@ -111,15 +112,24 @@ async function init() {
     await chrome.runtime.sendMessage({ type: 'close', site });
   });
 
-  // The same site may be waiting at a prompt in several tabs. Once a
-  // session starts in any of them, let the others through too.
-  if (site) {
-    chrome.storage.onChanged.addListener(async (changes, area) => {
-      if (area === 'local' && changes.sessions && !busy && (await store.hasLiveSession(site))) {
+  // Let this tab through once it no longer needs the prompt: a session
+  // started for the site in another tab, or the settings changed so the
+  // page isn't guarded anymore (site removed, or a "Never guard" exception
+  // added). Also checked once on load, for a prompt left open since then.
+  if (site && targetUrl) {
+    const release = async () => {
+      if (busy) return;
+      const { sites: current, allowed } = await store.getSettings();
+      const stillGuarded = guardedPattern(targetUrl, current.map((s) => s.pattern), allowed) === site;
+      if (!stillGuarded || (await store.hasLiveSession(site))) {
         busy = true;
         continueToSite();
       }
+    };
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'local' && (changes.sessions || changes.settings)) release();
     });
+    release();
   }
 }
 
