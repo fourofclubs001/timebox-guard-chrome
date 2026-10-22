@@ -37,18 +37,16 @@ function render() {
 function renderAllowed() {
   allowedList.replaceChildren(
     ...settings.allowed.map((pattern) => {
-      const item = document.createElement('li');
-      const remove = document.createElement('button');
-      remove.type = 'button';
-      remove.textContent = '×';
+      const row = $('allowedTemplate').content.firstElementChild.cloneNode(true);
+      row.querySelector('.site-name').textContent = pattern;
+      const remove = row.querySelector('.remove');
       remove.setAttribute('aria-label', `Remove exception ${pattern}`);
       remove.addEventListener('click', async () => {
         settings.allowed = settings.allowed.filter((p) => p !== pattern);
         await save();
         renderAllowed();
       });
-      item.append(pattern, remove);
-      return item;
+      return row;
     }),
   );
 }

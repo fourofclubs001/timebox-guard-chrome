@@ -35,7 +35,8 @@
         color: var(--danger);
       }
 
-      #sites {
+      #sites,
+      #allowed {
         list-style: none;
         margin: 12px 0 0;
         padding: 0;
@@ -84,31 +85,6 @@
 
       .excuses li button {
         padding: 2px 8px;
-      }
-
-      #allowed {
-        list-style: none;
-        margin: 12px 0 0;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      #allowed li {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 6px 4px 12px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: var(--bg);
-        overflow-wrap: anywhere;
-      }
-
-      #allowed li button {
-        padding: 0 7px;
-        border-radius: 50%;
       }
 
       .empty {
@@ -196,6 +172,15 @@
             <button type="submit">Add</button>
           </form>
           <p class="hint muted no-excuses">No reasons yet. Until you add one, the prompt keeps the free-text field.</p>
+        </div>
+      </li>
+    </template>
+
+    <template id="allowedTemplate">
+      <li class="card">
+        <div class="site-head">
+          <span class="site-name"></span>
+          <button type="button" class="remove danger">Remove</button>
         </div>
       </li>
     </template>
