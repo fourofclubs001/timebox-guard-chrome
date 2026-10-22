@@ -1,5 +1,5 @@
 import { formatDuration } from './metrics.js';
-import { matchPattern, normalizePattern } from './sites.js';
+import { guardedPattern, matchPattern, normalizePattern } from './sites.js';
 import * as store from './store.js';
 
 /**
@@ -34,8 +34,8 @@ async function render() {
     return;
   }
 
-  const { sites } = await store.getSettings();
-  const site = matchPattern(url, sites.map((s) => s.pattern));
+  const { sites, allowed } = await store.getSettings();
+  const site = guardedPattern(url, sites.map((s) => s.pattern), allowed);
 
   if (site) {
     siteEl.textContent = site;
@@ -62,6 +62,11 @@ async function render() {
   }
 
   siteEl.textContent = pattern;
+  const exception = matchPattern(url, allowed);
+  if (exception) {
+    statusEl.textContent = `Never guarded (exception: ${exception}).`;
+    return;
+  }
   statusEl.textContent = 'Not guarded.';
   showAction(
     'Guard this site',

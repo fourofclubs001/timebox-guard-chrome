@@ -3,7 +3,8 @@ import * as store from './store.js';
 
 /**
  * Configuration page: choose which sites are guarded, optionally restrict
- * each one's reason to a fixed list, and toggle the prompt shown when Chrome opens.
+ * each one's reason to a fixed list, list exceptions that are never
+ * guarded, and toggle the prompt shown when Chrome opens.
  */
 
 const $ = (id) => document.getElementById(id);
@@ -11,6 +12,10 @@ const sitesList = $('sites');
 const addInput = $('addInput');
 const addHint = $('addHint');
 const defaultHint = addHint.textContent;
+const allowedList = $('allowed');
+const allowInput = $('allowInput');
+const allowHint = $('allowHint');
+const defaultAllowHint = allowHint.textContent;
 
 let settings;
 
@@ -19,6 +24,7 @@ async function save() {
 }
 
 function render() {
+  renderAllowed();
   sitesList.replaceChildren(...settings.sites.map(siteRow));
   if (settings.sites.length === 0) {
     const empty = document.createElement('li');
@@ -26,6 +32,25 @@ function render() {
     empty.textContent = 'No sites guarded yet. Add one above, or use "Guard this site" in the toolbar popup.';
     sitesList.append(empty);
   }
+}
+
+function renderAllowed() {
+  allowedList.replaceChildren(
+    ...settings.allowed.map((pattern) => {
+      const item = document.createElement('li');
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.textContent = '×';
+      remove.setAttribute('aria-label', `Remove exception ${pattern}`);
+      remove.addEventListener('click', async () => {
+        settings.allowed = settings.allowed.filter((p) => p !== pattern);
+        await save();
+        renderAllowed();
+      });
+      item.append(pattern, remove);
+      return item;
+    }),
+  );
 }
 
 function siteRow(site) {
@@ -105,6 +130,24 @@ $('addForm').addEventListener('submit', async (event) => {
   addInput.value = '';
   addHint.textContent = defaultHint;
   render();
+});
+
+$('allowForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const pattern = normalizePattern(allowInput.value);
+  allowHint.classList.remove('error');
+  if (!pattern) {
+    allowHint.textContent = `"${allowInput.value.trim()}" doesn't look like a site. Try something like music.youtube.com.`;
+    allowHint.classList.add('error');
+    return;
+  }
+  if (!settings.allowed.includes(pattern)) settings.allowed.push(pattern);
+  await save();
+  allowInput.value = '';
+  allowHint.textContent = settings.sites.some((s) => s.pattern === pattern)
+    ? `${pattern} is also in the guarded list. The exception wins, so it won't be guarded.`
+    : defaultAllowHint;
+  renderAllowed();
 });
 
 $('openPrompt').addEventListener('change', async (event) => {

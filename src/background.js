@@ -1,4 +1,4 @@
-import { matchPattern } from './sites.js';
+import { guardedPattern } from './sites.js';
 import * as store from './store.js';
 
 /**
@@ -51,8 +51,8 @@ function promptUrl(site, url) {
 }
 
 async function guardedSiteFor(url) {
-  const { sites } = await store.getSettings();
-  return matchPattern(url, sites.map((s) => s.pattern));
+  const { sites, allowed } = await store.getSettings();
+  return guardedPattern(url, sites.map((s) => s.pattern), allowed);
 }
 
 /** If [url] is a guarded site with no live session, show the prompt in its place. */

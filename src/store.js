@@ -2,8 +2,9 @@
  * Everything the extension persists, in chrome.storage.local. This merges
  * the Android app's `Prefs` and `UsageLog`:
  *
- *  - `settings`  — guarded sites (each with its optional fixed reason list)
- *                  and whether to prompt whenever Chrome is opened.
+ *  - `settings`  — guarded sites (each with its optional fixed reason list),
+ *                  exceptions that are never guarded (`allowed`), and
+ *                  whether to prompt whenever Chrome is opened.
  *  - `sessions`  — `{ [site]: endTime }`, the session deadline per site.
  *  - `events`    — append-only usage log, capped at [MAX_EVENTS].
  *
@@ -33,7 +34,7 @@ async function get(key, fallback) {
 // ---- settings ------------------------------------------------------------
 
 export async function getSettings() {
-  return { sites: [], openPrompt: false, ...(await get('settings', {})) };
+  return { sites: [], allowed: [], openPrompt: false, ...(await get('settings', {})) };
 }
 
 export async function saveSettings(settings) {

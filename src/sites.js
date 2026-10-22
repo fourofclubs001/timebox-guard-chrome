@@ -6,6 +6,10 @@
  *   youtube.com          matches youtube.com, www.youtube.com, m.youtube.com
  *   reddit.com/r/all     matches only that section of reddit.com
  *
+ * Exceptions ("never guard") use the same patterns. Since the most
+ * specific match wins, "music.youtube.com" as an exception keeps that
+ * subdomain open while "youtube.com" stays guarded.
+ *
  * Patterns are stored already normalized (see [normalizePattern]) so they
  * can double as keys for sessions and usage events.
  */
@@ -54,4 +58,14 @@ export function matchPattern(url, patterns) {
     }
   }
   return best;
+}
+
+/**
+ * The guarded pattern [url] falls under, unless a more specific exception
+ * in [allowed] covers it. On a tie (the same pattern in both lists), the
+ * exception wins.
+ */
+export function guardedPattern(url, guarded, allowed = []) {
+  const best = matchPattern(url, [...guarded, ...allowed]);
+  return best !== null && guarded.includes(best) && !allowed.includes(best) ? best : null;
 }

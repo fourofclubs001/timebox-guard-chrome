@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { matchPattern, normalizePattern } from '../src/sites.js';
+import { guardedPattern, matchPattern, normalizePattern } from '../src/sites.js';
 
 test('normalizePattern strips scheme, www, port, query and trailing slash', () => {
   assert.equal(normalizePattern('https://www.YouTube.com/'), 'youtube.com');
@@ -41,4 +41,23 @@ test('matchPattern ignores non-web URLs', () => {
   assert.equal(matchPattern('chrome://newtab/', ['newtab']), null);
   assert.equal(matchPattern('chrome-extension://abc/prompt.html?site=youtube.com', ['youtube.com']), null);
   assert.equal(matchPattern('not a url', ['youtube.com']), null);
+});
+
+test('guardedPattern lets a more specific exception win', () => {
+  const guarded = ['youtube.com'];
+  const allowed = ['music.youtube.com'];
+  assert.equal(guardedPattern('https://www.youtube.com/watch?v=1', guarded, allowed), 'youtube.com');
+  assert.equal(guardedPattern('https://m.youtube.com/', guarded, allowed), 'youtube.com');
+  assert.equal(guardedPattern('https://music.youtube.com/watch?v=1', guarded, allowed), null);
+});
+
+test('guardedPattern: a more specific guarded pattern beats a broader exception', () => {
+  assert.equal(guardedPattern('https://reddit.com/r/all', ['reddit.com/r/all'], ['reddit.com']), 'reddit.com/r/all');
+  assert.equal(guardedPattern('https://reddit.com/r/pics', ['reddit.com/r/all'], ['reddit.com']), null);
+});
+
+test('guardedPattern: the exception wins a tie, and no exceptions behaves like matchPattern', () => {
+  assert.equal(guardedPattern('https://youtube.com/', ['youtube.com'], ['youtube.com']), null);
+  assert.equal(guardedPattern('https://youtube.com/', ['youtube.com']), 'youtube.com');
+  assert.equal(guardedPattern('https://example.com/', ['youtube.com'], ['music.youtube.com']), null);
 });

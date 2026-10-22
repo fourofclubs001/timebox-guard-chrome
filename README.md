@@ -51,6 +51,11 @@ The Android app's pieces map onto the extension like this:
 - `reddit.com/r/all` guards only that path and everything under it.
 - When several patterns match, the most specific one wins. Each pattern
   has its own session and its own reason list.
+- **Never guard** (in Settings) lists exceptions that use the same patterns
+  and the same most-specific-wins rule. With `youtube.com` guarded, adding
+  `music.youtube.com` keeps YouTube Music open while everything else on
+  YouTube still asks first. An exception also wins over the exact same
+  pattern in the guarded list.
 
 ## Installing it (unpacked)
 
