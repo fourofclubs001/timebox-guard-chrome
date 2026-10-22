@@ -191,6 +191,16 @@ const handlers = {
     return {};
   },
 
+  /**
+   * Whether [url] would be blocked right now. The prompt asks this rather
+   * than deciding itself, so the two can never disagree and bounce a tab
+   * back and forth.
+   */
+  async check({ url }) {
+    const site = await guardedSiteFor(url);
+    return { blocked: Boolean(site) && !(await store.hasLiveSession(site)) };
+  },
+
   async clearEvents() {
     await store.clearEvents();
     return {};

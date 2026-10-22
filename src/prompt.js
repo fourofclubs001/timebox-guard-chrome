@@ -1,4 +1,3 @@
-import { guardedPattern } from './sites.js';
 import * as store from './store.js';
 
 /**
@@ -119,9 +118,14 @@ async function init() {
   if (site && targetUrl) {
     const release = async () => {
       if (busy) return;
-      const { sites: current, allowed } = await store.getSettings();
-      const stillGuarded = guardedPattern(targetUrl, current.map((s) => s.pattern), allowed) === site;
-      if (!stillGuarded || (await store.hasLiveSession(site))) {
+      const answer = await chrome.runtime.sendMessage({ type: 'check', url: targetUrl }).catch(() => null);
+      if (!answer) {
+        // A background script that predates "check" is still running (an
+        // unpacked extension updated on disk but not reloaded).
+        $('stale').hidden = false;
+        return;
+      }
+      if (!answer.blocked && !busy) {
         busy = true;
         continueToSite();
       }

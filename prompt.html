@@ -92,6 +92,15 @@
         min-height: 1em;
       }
 
+      .stale {
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--danger);
+        font-size: 13px;
+      }
+
       .actions {
         display: flex;
         flex-direction: column;
@@ -132,6 +141,11 @@ how long and why?</h1>
         <select id="reasonSelect" aria-labelledby="reasonLabel" hidden></select>
         <p class="error" id="error" role="alert"></p>
       </div>
+
+      <p class="stale" id="stale" role="alert" hidden>
+        Timebox Guard was updated but is still running its old version. Open
+        <strong>chrome://extensions</strong> and click the reload icon on Timebox Guard.
+      </p>
 
       <div class="actions">
         <button type="submit" class="primary" id="start">Start session</button>
