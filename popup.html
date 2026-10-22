@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Timebox Guard</title>
+    <link rel="stylesheet" href="common.css" />
+    <style>
+      body {
+        width: 300px;
+        background: var(--surface);
+      }
+
+      main {
+        padding: 14px 16px;
+      }
+
+      .site {
+        font-weight: 600;
+        font-size: 15px;
+        overflow-wrap: anywhere;
+      }
+
+      #status {
+        margin: 4px 0 12px;
+      }
+
+      #status strong {
+        font-variant-numeric: tabular-nums;
+      }
+
+      #action {
+        width: 100%;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid var(--border);
+        padding: 10px 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="site" id="site"></div>
+      <div class="muted" id="status"></div>
+      <button type="button" id="action" hidden></button>
+    </main>
+    <nav>
+      <button type="button" class="link" data-page="dashboard.html">Dashboard</button>
+      <button type="button" class="link" data-page="settings.html">Settings</button>
+    </nav>
+    <script type="module" src="src/popup.js"></script>
+  </body>
+</html>

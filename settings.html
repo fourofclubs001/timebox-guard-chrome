@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Timebox Guard Settings</title>
+    <link rel="icon" href="icons/icon32.png" />
+    <link rel="stylesheet" href="common.css" />
+    <style>
+      section {
+        margin-top: 22px;
+      }
+
+      section > h2 {
+        font-size: 15px;
+        margin-bottom: 8px;
+      }
+
+      .add-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .add-row input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .hint {
+        font-size: 13px;
+        margin: 8px 0 0;
+      }
+
+      .error {
+        color: var(--danger);
+      }
+
+      #sites {
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .site-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .site-name {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+
+      .site .switch {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+
+      .excuses {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--bg);
+      }
+
+      .excuses ul {
+        list-style: none;
+        margin: 0 0 10px;
+        padding: 0;
+      }
+
+      .excuses li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 0;
+      }
+
+      .excuses li button {
+        padding: 2px 8px;
+      }
+
+      .empty {
+        text-align: center;
+        padding: 24px 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <h1>Settings</h1>
+        <a href="dashboard.html">← Dashboard</a>
+      </header>
+
+      <section>
+        <h2>Guarded sites</h2>
+        <div class="card">
+          <form class="add-row" id="addForm" autocomplete="off">
+            <input type="text" id="addInput" placeholder="youtube.com or reddit.com/r/all" aria-label="Site to guard" />
+            <button type="submit" class="primary">Add</button>
+          </form>
+          <p class="hint muted" id="addHint">
+            A domain covers its subdomains (youtube.com also guards m.youtube.com). Add a path to guard only part
+            of a site.
+          </p>
+          <ul id="sites"></ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Prompt</h2>
+        <div class="card">
+          <label class="switch">
+            <span>
+              Ask for time + reason when I unlock my computer
+              <br /><span class="muted hint">Needs Chrome to be running when you unlock.</span>
+            </span>
+            <input type="checkbox" id="unlockPrompt" />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Good to know</h2>
+        <div class="card muted">
+          <p style="margin-top: 0">
+            Incognito windows aren't guarded unless you allow it: open <strong>chrome://extensions</strong>, click
+            <strong>Details</strong> on Timebox Guard and turn on <strong>Allow in Incognito</strong>.
+          </p>
+          <p style="margin-bottom: 0">Everything stays in this browser. Nothing is sent anywhere.</p>
+        </div>
+      </section>
+    </main>
+
+    <template id="siteTemplate">
+      <li class="site card">
+        <div class="site-head">
+          <span class="site-name"></span>
+          <button type="button" class="remove danger">Remove</button>
+        </div>
+        <label class="switch">
+          <span>Restrict to a list of reasons</span>
+          <input type="checkbox" class="excuses-toggle" />
+        </label>
+        <div class="excuses" hidden>
+          <ul></ul>
+          <form class="add-row" autocomplete="off">
+            <input type="text" maxlength="200" placeholder="Add a reason" aria-label="New reason" />
+            <button type="submit">Add</button>
+          </form>
+          <p class="hint muted no-excuses">No reasons yet. Until you add one, the prompt keeps the free-text field.</p>
+        </div>
+      </li>
+    </template>
+
+    <script type="module" src="src/settings.js"></script>
+  </body>
+</html>

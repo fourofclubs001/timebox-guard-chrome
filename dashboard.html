@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Timebox Guard Dashboard</title>
+    <link rel="icon" href="icons/icon32.png" />
+    <link rel="stylesheet" href="common.css" />
+    <style>
+      .ranges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .ranges button {
+        border-radius: 999px;
+        padding: 5px 14px;
+      }
+
+      .ranges button[aria-pressed='true'] {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-text);
+        font-weight: 600;
+      }
+
+      #content h2 {
+        font-size: 15px;
+        margin: 26px 0 8px;
+      }
+
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .tile .value {
+        font-size: 22px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tile .label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .split {
+        display: flex;
+        height: 14px;
+        border-radius: 7px;
+        overflow: hidden;
+        gap: 2px;
+        margin-top: 8px;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .legend span::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+        vertical-align: -1px;
+        background: var(--dot);
+      }
+
+      .chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 180px;
+        padding-top: 8px;
+      }
+
+      .chart .col {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+      }
+
+      .chart .bar-area {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .chart .bar {
+        width: 100%;
+        max-width: 42px;
+        background: var(--accent);
+        border-radius: 4px 4px 0 0;
+        min-height: 2px;
+      }
+
+      .chart .bar.zero {
+        background: var(--track);
+      }
+
+      .chart .day {
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .chart .today {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .chart .amount {
+        color: var(--muted);
+        white-space: nowrap;
+        min-height: 1.4em;
+      }
+
+      .site-row {
+        padding: 8px 0;
+      }
+
+      .site-row + .site-row {
+        border-top: 1px solid var(--border);
+      }
+
+      .site-row .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .site-row .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .site-row .stats {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .track {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--track);
+        margin-top: 5px;
+      }
+
+      .track div {
+        height: 100%;
+        border-radius: 3px;
+        background: var(--accent);
+      }
+
+      .reason + .reason {
+        border-top: 1px solid var(--border);
+      }
+
+      .reason {
+        padding: 8px 0;
+      }
+
+      .reason q {
+        display: block;
+      }
+
+      .reason small {
+        color: var(--muted);
+      }
+
+      footer {
+        margin-top: 32px;
+        text-align: center;
+      }
+
+      @media (max-width: 480px) {
+        .chart {
+          gap: 3px;
+        }
+        .chart .amount {
+          font-size: 9px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <h1>Timebox Guard</h1>
+        <a href="settings.html">Settings</a>
+      </header>
+
+      <div class="ranges" role="group" aria-label="Time window">
+        <button type="button" data-range="today">Today</button>
+        <button type="button" data-range="week">7 days</button>
+        <button type="button" data-range="month">30 days</button>
+        <button type="button" data-range="all">All time</button>
+      </div>
+
+      <div id="content"></div>
+
+      <footer>
+        <button type="button" class="danger" id="clear">Clear all usage data</button>
+      </footer>
+    </main>
+
+    <script type="module" src="src/dashboard.js"></script>
+  </body>
+</html>

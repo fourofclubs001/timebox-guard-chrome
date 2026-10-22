@@ -1,0 +1,10 @@
+{
+  "name": "timebox-guard-chrome",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Timebox Guard as a Chrome extension: guards websites instead of apps.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
